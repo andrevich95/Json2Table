@@ -11,34 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 <h2>Installation</h2>
 Install npm and run <code>npm update</code>
 
-Create html block with table the same structure
-<code>
-<div id="table-block">
-            <table class="table table-striped">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Name</th>
-                        <th>Value</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-            <p class="alert alert-danger" id="error-msg" style="display:none"></p>
-            <form enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="json-holder" class="alert alert-primary">Textarea format: [{"name":"<code>your name</code>","value":"<code>your value</code>"}]</label>
-                    <textarea class="form-control" id="json-holder" cols="40" rows="5" placeholder="Input Json Data"></textarea>
-                    <button class="btn btn-primary" id="add-json">ADD TO TABLE</button>
-                    <button class="btn btn-primary" id="replace-json">REPLACE TABLE DATA</button>
-                    <button class="btn btn-primary" id="load-json">LOAD TO TEXT AREA</button>
-                    <input class="btn btn-success" type="file" id="file-load" accept="application/json" placeholder="LOAD JSON/CSV">
-                    <button class="btn btn-success" id="file-export">EXPORT FILE</button>
-                </div>
-            </form>
-  </div>
-</code>
+Create html block with table the same structure as in example.
 
 In your js init table
 <code>$('#table-block').jsonTable();</code>
