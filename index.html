@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Table Slider</title>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="js/json_table.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+</head>
+<body>
+    <main class="container">
+        <h1 class="card-header">Test table json</h1>
+        <div id="table-block">
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Value</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <p class="alert alert-danger" id="error-msg" style="display:none"></p>
+            <form enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="json-holder" class="alert alert-primary">Textarea format: [{"name":"<code>your name</code>","value":"<code>your value</code>"}]</label>
+                    <textarea class="form-control" id="json-holder" cols="40" rows="5" placeholder="Input Json Data"></textarea>
+                    <button class="btn btn-primary" id="add-json">ADD</button>
+                    <button class="btn btn-primary" id="replace-json">REPLACE</button>
+                    <button class="btn btn-primary" id="load-json">LOAD</button>
+                    <input class="btn btn-success" type="file" id="file-load" accept="text/csv, text/json" placeholder="LOAD JSON/CSV">
+                    <button class="btn btn-success" id="file-export">EXPORT FILE</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
