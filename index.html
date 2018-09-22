@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/style.css"/>
     <script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="node_modules/write/index.js"></script>
     <script type="text/javascript" src="js/json_table.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
 </head>
@@ -30,10 +31,10 @@
                 <div class="form-group">
                     <label for="json-holder" class="alert alert-primary">Textarea format: [{"name":"<code>your name</code>","value":"<code>your value</code>"}]</label>
                     <textarea class="form-control" id="json-holder" cols="40" rows="5" placeholder="Input Json Data"></textarea>
-                    <button class="btn btn-primary" id="add-json">ADD</button>
-                    <button class="btn btn-primary" id="replace-json">REPLACE</button>
-                    <button class="btn btn-primary" id="load-json">LOAD</button>
-                    <input class="btn btn-success" type="file" id="file-load" accept="text/csv, text/json" placeholder="LOAD JSON/CSV">
+                    <button class="btn btn-primary" id="add-json">ADD TO TABLE</button>
+                    <button class="btn btn-primary" id="replace-json">REPLACE TABLE DATA</button>
+                    <button class="btn btn-primary" id="load-json">LOAD TO TEXT AREA</button>
+                    <input class="btn btn-success" type="file" id="file-load" accept="application/json" placeholder="LOAD JSON/CSV">
                     <button class="btn btn-success" id="file-export">EXPORT FILE</button>
                 </div>
             </form>
