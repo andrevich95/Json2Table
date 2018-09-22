@@ -1,0 +1,29 @@
+{
+  "name": "tablejsoncsv",
+  "version": "1.0.0",
+  "description": "tool for convert json to table data",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrevich95/Json2Table.git"
+  },
+  "keywords": [
+    "json",
+    "table",
+    "data"
+  ],
+  "author": "andrevich95",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/andrevich95/Json2Table/issues"
+  },
+  "homepage": "https://github.com/andrevich95/Json2Table#readme",
+  "dependencies": {
+    "bootstrap": "^4.1.3",
+    "font-awesome": "^4.7.0",
+    "jquery": "^3.3.1"
+  }
+}
