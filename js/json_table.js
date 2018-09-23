@@ -41,17 +41,21 @@ $.fn.jsonTable = function(){
         const input = this;
         const url = $(this).val();
         const ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
-        if (input.files && input.files[0] && (ext === "csv" || ext === "json")) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                string2table(e.target.result,$(table));
-            };
-            reader.readAsText(input.files[0]);
+        try{
+            if (input.files && input.files[0] && (ext === "csv" || ext === "json")) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    string2table(e.target.result,$(table));
+                };
+                reader.readAsText(input.files[0]);
+            }
+            else {
+                $(error_msg).html('Error loading file').show();
+            }
+        }catch (e) {
+            $(error_msg).html(e.message).show();
         }
-        else {
-            $(error_msg).html('Error loading file').show();
-        }
-        input.replaceWith(input.val('').clone(true));
+        $(input).replaceWith($(input).val('').clone(true));
     }).on('click', '.delete-action', function(){
         $(this).parents('tr').remove();
     }).on('click', '.edit-action', function(){
@@ -78,6 +82,54 @@ $.fn.jsonTable = function(){
 
         $(key).text($(key).find('input').val());
         $(value).text($(value).find('input').val());
+    }).on('click', '#key-up', function (e) {
+        e.preventDefault();
+        let sort_array = rows2json($(table));
+        sort_array.sort(function (a, b) {
+            let name_a = a.name.toLowerCase();
+            let name_b = b.name.toLowerCase();
+            return name_a > name_b;
+        });
+        $(tbody).html('');
+        sort_array.forEach(function (el) {
+            $(tbody).append(obj2row(el));
+        });
+    }).on('click', '#key-down', function (e) {
+        e.preventDefault();
+        let sort_array = rows2json($(table));
+        sort_array.sort(function (a, b) {
+            let name_a = a.name.toLowerCase();
+            let name_b = b.name.toLowerCase();
+            return name_a < name_b;
+        });
+        $(tbody).html('');
+        sort_array.forEach(function (el) {
+            $(tbody).append(obj2row(el));
+        });
+    }).on('click', '#value-up', function (e) {
+        e.preventDefault();
+        let sort_array = rows2json($(table));
+        sort_array.sort(function (a, b) {
+            let value_a = a.value.toLowerCase();
+            let value_b = b.value.toLowerCase();
+            return value_a > value_b;
+        });
+        $(tbody).html('');
+        sort_array.forEach(function (el) {
+            $(tbody).append(obj2row(el));
+        });
+    }).on('click', '#value-down', function (e) {
+        e.preventDefault();
+        let sort_array = rows2json($(table));
+        sort_array.sort(function (a, b) {
+            let value_a = a.value.toLowerCase();
+            let value_b = b.value.toLowerCase();
+            return value_a < value_b;
+        });
+        $(tbody).html('');
+        sort_array.forEach(function (el) {
+            $(tbody).append(obj2row(el));
+        });
     });
 };
 

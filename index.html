@@ -18,8 +18,8 @@
             <table class="table table-striped">
                 <thead class="thead-dark">
                     <tr>
-                        <th>Name</th>
-                        <th>Value</th>
+                        <th>Name<span class="fa fa-level-up" id="key-up"></span><span class="fa fa-level-down" id="key-down"></span></th>
+                        <th>Value<span class="fa fa-level-up" id="value-up"></span><span class="fa fa-level-down" id="value-down"></span></th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -36,6 +36,8 @@
                     <button class="btn btn-primary" id="load-json">LOAD TO TEXT AREA</button>
                     <input class="btn btn-success" type="file" id="file-load" accept="application/json" placeholder="LOAD JSON/CSV">
                     <button class="btn btn-success" id="file-export">EXPORT FILE</button>
+                    <label class="radio-inline"><input type="radio" name="file-format" checked>JSON</label>
+                    <label class="radio-inline"><input type="radio" name="file-format">CSV</label>
                 </div>
             </form>
         </div>
