@@ -61,7 +61,7 @@ $.fn.jsonTable = function(){
                 reader.onload = function (e) {
                     let text = e.target.result;
                     if(ext === 'csv') {
-                        string2table(csv2json(text),$(table));
+                        string2table(JSON.stringify(csv2json(text.substr(0,text.length))),$(table));
                     }
                     else {
                         string2table(text, $(table));
@@ -224,5 +224,5 @@ function json2csv(obj) {
     obj.forEach(function (el) {
         str += el.name + ',' + el.value + '\n';
     });
-    return str.substr(0,str.length);
+    return str.substr(0,str.length-1);
 }
