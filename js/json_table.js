@@ -5,12 +5,17 @@ $.fn.jsonTable = function(){
     const tbody = $(table).find('tbody');
     const textarea = $(this).find('#json-holder');
     const error_msg = $(this).find('#error-msg');
+    const file_field = $('input[name="file-format"]');
+    let format = 'json';
 
     //Actions on main area
     table_block.on('click','#add-json', function (e) {
         e.preventDefault();
         $(error_msg).hide();
         let val = $(textarea).val();
+        if(format === 'csv'){
+            val = JSON.stringify(csv2json(val));
+        }
         try {
             string2table(val, $(table));
         }catch (e) {
@@ -20,8 +25,14 @@ $.fn.jsonTable = function(){
         e.preventDefault();
         $(error_msg).hide();
         try{
+            let str = '';
             let json = rows2json($(table));
-            $(textarea).val(JSON.stringify(json));
+            if(format === 'csv'){
+                str = json2csv(json);
+            }else {
+                str = JSON.stringify(json);
+            }
+            $(textarea).val(str);
         }catch (e) {
             $(error_msg).html(e.message).show();
         }
@@ -31,6 +42,9 @@ $.fn.jsonTable = function(){
         $(tbody).html('');
         $(error_msg).hide();
         let val = $(textarea).val();
+        if(format === 'csv'){
+            val = JSON.stringify(csv2json(val));
+        }
         try{
             string2table(val, $(table));
         }catch (e) {
@@ -45,7 +59,13 @@ $.fn.jsonTable = function(){
             if (input.files && input.files[0] && (ext === "csv" || ext === "json")) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    string2table(e.target.result,$(table));
+                    let text = e.target.result;
+                    if(ext === 'csv') {
+                        string2table(csv2json(text),$(table));
+                    }
+                    else {
+                        string2table(text, $(table));
+                    }
                 };
                 reader.readAsText(input.files[0]);
             }
@@ -56,6 +76,14 @@ $.fn.jsonTable = function(){
             $(error_msg).html(e.message).show();
         }
         $(input).replaceWith($(input).val('').clone(true));
+    }).on('click', '#file-export', function (e) {
+        e.preventDefault();
+        let table_data = rows2json($(table));
+        if(format === 'csv') {
+            write2file(json2csv(table_data),format);
+        }else {
+            write2file(JSON.stringify(table_data),format);
+        }
     }).on('click', '.delete-action', function(){
         $(this).parents('tr').remove();
     }).on('click', '.edit-action', function(){
@@ -130,6 +158,15 @@ $.fn.jsonTable = function(){
         sort_array.forEach(function (el) {
             $(tbody).append(obj2row(el));
         });
+    }).on('click', 'input[name="file-format"]', function () {
+        format = $(this).data('type');
+        let text_json = '[{"name":"<code>your name</code>","value":"<code>your value</code>"},{"name":"<code>your second name</code>","value":"<code>your second value</code>"}]';
+        let text_csv = '<code>Yourname</code>,<code>Yourvalue</code><br><code>Yourname</code>,<code>Yourvalue</code>';
+        if(format === 'csv') {
+            $(file_field).html(text_csv);
+        }else {
+            $(file_field).html(text_json);
+        }
     });
 };
 
@@ -159,9 +196,33 @@ function obj2row(obj){
     return tr;
 }
 
-function writefile(filename, table){
-    let file = new File([""], filename);
-    file.open("w"); // open file with write access
-    file.writeln(JSON.stringify(rows2json(table)));
-    file.close();
+function write2file(string2write, format){
+    const a = document.createElement("a");
+    const data_format = (format === 'csv') ? 'text/csv' : 'application/json';
+    const filename = 'export_table.'+format;
+    a.href = "data:"+data_format+"," + encodeURIComponent(string2write);
+    a.setAttribute("download", filename);
+    document.body.appendChild(a);
+    setTimeout(function () {
+        a.click();
+        document.body.removeChild(a);
+    }, 200);
+}
+
+function csv2json(str) {
+    let rows = str.split('\n');
+    let result = [];
+    rows.forEach(function (el) {
+        let obj = el.split(',');
+        result.push({name:obj[0], value:obj[1]});
+    });
+    return result;
+}
+
+function json2csv(obj) {
+    let str = '';
+    obj.forEach(function (el) {
+        str += el.name + ',' + el.value + '\n';
+    });
+    return str.substr(0,str.length);
 }
