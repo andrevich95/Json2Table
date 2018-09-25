@@ -1,59 +1,79 @@
-$.fn.jsonTable = function(){
-    //Initialize variables
-    const table_block = this;
-    const table = $(this).find('table');
-    const tbody = $(table).find('tbody');
-    const textarea = $(this).find('#json-holder');
-    const error_msg = $(this).find('#error-msg');
-    const file_field = $('input[name="file-format"]');
+function tableJsonify(elem){
+    this.elem = elem;
+}
+
+tableJsonify.prototype.alertFunction = function() {
+    const table = this.elem.querySelector('table');
+    const tbody = this.elem.querySelector('tbody');
+    const add_json = this.elem.querySelector('#add-json');
+    const load_json = this.elem.querySelector('#load-json');
+    const replace_json = this.elem.querySelector('#replace-json');
+    const file_load = this.elem.querySelector('#file-load');
+    const textarea = this.elem.querySelector('#json-holder');
+    const error_msg = this.elem.querySelector('#error-msg');
+    const file_export = this.elem.querySelector('#file-export');
+    const change_format = this.elem.getElementsByName('file-format');
+
+    // Constants for sorting
+    const key_up = this.elem.querySelector('#key-up');
+    const key_down = this.elem.querySelector('#key-down');
+    const value_up = this.elem.querySelector('#value-up');
+    const value_down = this.elem.querySelector('#value-down');
+
+    const file_field = this.elem.querySelector('#hint');
     let format = 'json';
 
-    //Actions on main area
-    table_block.on('click','#add-json', function (e) {
+    add_json.addEventListener('click', function (e) {
+        alert(1);
         e.preventDefault();
-        $(error_msg).hide();
-        let val = $(textarea).val();
+        error_msg.style.display = 'none';
+        let val = textarea.value;
         if(format === 'csv'){
             val = JSON.stringify(csv2json(val));
         }
         try {
-            string2table(val, $(table));
+            string2table(val, table);
         }catch (e) {
-            $(error_msg).html(e.message).show();
+            error_msg.style.display = 'block';
+            error_msg.innerHTML= e.message;
         }
-    }).on('click','#load-json', function(e){
+    });
+    load_json.addEventListener('click',function(e){
         e.preventDefault();
-        $(error_msg).hide();
+        error_msg.style.display = 'none';
         try{
             let str = '';
-            let json = rows2json($(table));
+            let json = rows2json(table);
             if(format === 'csv'){
                 str = json2csv(json);
             }else {
                 str = JSON.stringify(json);
             }
-            $(textarea).val(str);
+            textarea.value = str;
         }catch (e) {
-            $(error_msg).html(e.message).show();
+            error_msg.innerHTML = e.message;
+            error_msg.style.display = 'block';
         }
-    }).on('click','#replace-json', function(e){
+    });
+    replace_json.addEventListener('click',function(e){
         e.preventDefault();
-        $(error_msg).hide();
-        $(tbody).html('');
-        $(error_msg).hide();
-        let val = $(textarea).val();
+        error_msg.style.display = 'none';
+        tbody.innerHTML = '';
+        let val = textarea.value;
         if(format === 'csv'){
             val = JSON.stringify(csv2json(val));
         }
         try{
-            string2table(val, $(table));
+            string2table(val, table);
         }catch (e) {
-            $(error_msg).html(e.message).show();
+            error_msg.innerHTML = e.message;
+            error_msg.style.display = 'block';
         }
-    }).on('change','#file-load',function (e) {
-        $(error_msg).hide();
+    });
+    file_load.addEventListener('change', function (e) {
+        error_msg.style.display = 'none';
         const input = this;
-        const url = $(this).val();
+        const url = input.value;
         const ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
         try{
             if (input.files && input.files[0] && (ext === "csv" || ext === "json")) {
@@ -61,104 +81,106 @@ $.fn.jsonTable = function(){
                 reader.onload = function (e) {
                     let text = e.target.result;
                     if(ext === 'csv') {
-                        string2table(JSON.stringify(csv2json(text.substr(0,text.length))),$(table));
+                        string2table(JSON.stringify(csv2json(text.substr(0,text.length))),table);
                     }
                     else {
-                        string2table(text, $(table));
+                        string2table(text, table);
                     }
                 };
                 reader.readAsText(input.files[0]);
             }
             else {
-                $(error_msg).html('Error loading file').show();
+                error_msg.innerHTML = 'Error load file';
+                error_msg.style.display = 'block';
             }
         }catch (e) {
-            $(error_msg).html(e.message).show();
+            error_msg.innerHTML = e.message;
+            error_msg.style.display = 'block';
         }
         $(input).replaceWith($(input).val('').clone(true));
-    }).on('click', '#file-export', function (e) {
+    });
+
+    file_export.addEventListener('click',function (e) {
         e.preventDefault();
-        let table_data = rows2json($(table));
+        let table_data = rows2json(table);
         if(format === 'csv') {
             write2file(json2csv(table_data),format);
         }else {
             write2file(JSON.stringify(table_data),format);
         }
-    }).on('click', '.delete-action', function(){
-        $(this).parents('tr').remove();
-    }).on('click', '.edit-action', function(){
-        $(this).find('span').removeClass('fa-pencil');
-        $(this).find('span').addClass('fa-save');
+    });
 
-        $(this).removeClass('edit-action');
-        $(this).addClass('save-action');
-
-        let key = $(this).parents('tr').find('td:nth-child(1)');
-        let value = $(this).parents('tr').find('td:nth-child(2)');
-
-        $(key).html('<input type="text" value="'+$(key).text()+'"/>');
-        $(value).html('<input type="text" value="'+$(value).text()+'"/>');
-    }).on('click', '.save-action', function(){
-        $(this).find('span').removeClass('fa-save');
-        $(this).find('span').addClass('fa-pencil');
-
-        $(this).removeClass('save-action');
-        $(this).addClass('edit-action');
-
-        let key = $(this).parents('tr').find('td:nth-child(1)');
-        let value = $(this).parents('tr').find('td:nth-child(2)');
-
-        $(key).text($(key).find('input').val());
-        $(value).text($(value).find('input').val());
-    }).on('click', '#key-up', function (e) {
+    //Sorting onclick actions implemented
+    key_up.addEventListener('click',function (e) {
         e.preventDefault();
-        let sort_array = rows2json($(table));
+        let sort_array = rows2json(table);
         sort_array.sort(function (a, b) {
             let name_a = a.name.toLowerCase();
             let name_b = b.name.toLowerCase();
-            return name_a > name_b;
+            if (name_a > name_b)
+                return -1;
+            else return 1;
         });
-        $(tbody).html('');
+        tbody.innerHTML = '';
         sort_array.forEach(function (el) {
-            $(tbody).append(obj2row(el));
+            tbody.append(obj2row(el));
         });
-    }).on('click', '#key-down', function (e) {
+    });
+
+    key_down.addEventListener('click',function (e) {
         e.preventDefault();
-        let sort_array = rows2json($(table));
+        let sort_array = rows2json(table);
         sort_array.sort(function (a, b) {
             let name_a = a.name.toLowerCase();
             let name_b = b.name.toLowerCase();
-            return name_a < name_b;
+            if (name_a < name_b)
+                return -1;
+            else return 1;
         });
-        $(tbody).html('');
+        tbody.innerHTML = '';
         sort_array.forEach(function (el) {
-            $(tbody).append(obj2row(el));
+            tbody.append(obj2row(el));
         });
-    }).on('click', '#value-up', function (e) {
+    });
+
+    value_up.addEventListener('click',function (e) {
         e.preventDefault();
-        let sort_array = rows2json($(table));
+        let sort_array = rows2json(table);
         sort_array.sort(function (a, b) {
             let value_a = a.value.toLowerCase();
             let value_b = b.value.toLowerCase();
-            return value_a > value_b;
+            if (value_a > value_b)
+                return -1;
+            else return 1;
         });
-        $(tbody).html('');
+        tbody.innerHTML = '';
         sort_array.forEach(function (el) {
-            $(tbody).append(obj2row(el));
+            tbody.append(obj2row(el));
         });
-    }).on('click', '#value-down', function (e) {
+    });
+
+    value_down.addEventListener('click',function (e) {
         e.preventDefault();
-        let sort_array = rows2json($(table));
+        let sort_array = rows2json(table);
         sort_array.sort(function (a, b) {
             let value_a = a.value.toLowerCase();
             let value_b = b.value.toLowerCase();
-            return value_a < value_b;
+            if (value_a < value_b)
+                return -1;
+            else return 1;
         });
-        $(tbody).html('');
+        tbody.innerHTML = '';
         sort_array.forEach(function (el) {
-            $(tbody).append(obj2row(el));
+            tbody.append(obj2row(el));
         });
-    }).on('click', 'input[name="file-format"]', function () {
+    });
+
+    for(el in change_format){
+        el.onclick = function () {
+            alert(1);
+        }
+    }
+    change_format.addEventListener('change',function () {
         format = $(this).data('type');
         let text_json = '[{"name":"<code>your name</code>","value":"<code>your value</code>"},{"name":"<code>your second name</code>","value":"<code>your second value</code>"}]';
         let text_csv = '<code>Yourname</code>,<code>Yourvalue</code><br><code>Yourname</code>,<code>Yourvalue</code>';
@@ -190,8 +212,8 @@ function rows2json(table){
 function obj2row(obj){
     let tr = $('<tr></tr>');
     let td = $('<td></td>');
-    let actions = '<button class="btn edit-action"><span class="fa fa-pencil"></span></button>' +
-        '<button class="btn delete-action"><span class="fa fa-trash-o"></span></button>';
+    let actions = '<button class="btn" onclick="edit_tr()"><span class="fa fa-pencil"></span></button>' +
+        '<button class="btn" onclick="delete_tr()"><span class="fa fa-trash-o"></span></button>';
     tr.append(td.clone().text(obj.name)).append(td.clone().text(obj.value)).append(td.clone().html(actions));
     return tr;
 }
@@ -225,4 +247,40 @@ function json2csv(obj) {
         str += el.name + ',' + el.value + '\n';
     });
     return str.substr(0,str.length-1);
+}
+
+function delete_tr(e){
+    console.log(1);
+}
+
+function save_tr(e){
+    console.log(2);
+    this.onclick = 'edit_tr()';
+    $(this).find('span').removeClass('fa-save');
+    $(this).find('span').addClass('fa-pencil');
+
+    $(this).removeClass('save-action');
+    $(this).addClass('edit-action');
+
+    let key = $(this).parents('tr').find('td:nth-child(1)');
+    let value = $(this).parents('tr').find('td:nth-child(2)');
+
+    $(key).text($(key).find('input').val());
+    $(value).text($(value).find('input').val());
+}
+
+function edit_tr(e){
+    console.log(3);
+    this.onclick = 'save_tr()';
+
+    this.closest('fa-save')
+    $(this).find('span').removeClass('fa-save');
+    $(this).find('span').addClass('fa-pencil');
+
+    let key = $(this).parents('tr').find('td:nth-child(1)');
+    let value = $(this).parents('tr').find('td:nth-child(2)');
+
+    $(key).text($(key).find('input').val());
+    $(value).text($(value).find('input').val());
+
 }

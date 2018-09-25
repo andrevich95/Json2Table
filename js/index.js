@@ -1,3 +1,4 @@
-$(document).ready(function(){
-    $('#table-block').jsonTable();
+document.addEventListener("DOMContentLoaded", function(event) {
+    let mytable = new tableJsonify(document.getElementById('table-block'));
+    mytable.alertFunction();
 });
