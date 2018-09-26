@@ -2,7 +2,7 @@ function tableJsonify(elem){
     this.elem = elem;
 }
 
-tableJsonify.prototype.alertFunction = function() {
+tableJsonify.prototype.initFunction = function() {
     const table = this.elem.querySelector('table');
     const tbody = this.elem.querySelector('tbody');
     const add_json = this.elem.querySelector('#add-json');
@@ -12,7 +12,8 @@ tableJsonify.prototype.alertFunction = function() {
     const textarea = this.elem.querySelector('#json-holder');
     const error_msg = this.elem.querySelector('#error-msg');
     const file_export = this.elem.querySelector('#file-export');
-    const change_format = this.elem.getElementsByName('file-format');
+    const json_file = this.elem.querySelector('#json-file');
+    const csv_file = this.elem.querySelector('#csv-file');
 
     // Constants for sorting
     const key_up = this.elem.querySelector('#key-up');
@@ -24,7 +25,6 @@ tableJsonify.prototype.alertFunction = function() {
     let format = 'json';
 
     add_json.addEventListener('click', function (e) {
-        alert(1);
         e.preventDefault();
         error_msg.style.display = 'none';
         let val = textarea.value;
@@ -32,7 +32,7 @@ tableJsonify.prototype.alertFunction = function() {
             val = JSON.stringify(csv2json(val));
         }
         try {
-            string2table(val, table);
+            string2table(val, tbody);
         }catch (e) {
             error_msg.style.display = 'block';
             error_msg.innerHTML= e.message;
@@ -43,7 +43,7 @@ tableJsonify.prototype.alertFunction = function() {
         error_msg.style.display = 'none';
         try{
             let str = '';
-            let json = rows2json(table);
+            let json = rows2json(tbody);
             if(format === 'csv'){
                 str = json2csv(json);
             }else {
@@ -64,7 +64,7 @@ tableJsonify.prototype.alertFunction = function() {
             val = JSON.stringify(csv2json(val));
         }
         try{
-            string2table(val, table);
+            string2table(val, tbody);
         }catch (e) {
             error_msg.innerHTML = e.message;
             error_msg.style.display = 'block';
@@ -81,10 +81,10 @@ tableJsonify.prototype.alertFunction = function() {
                 reader.onload = function (e) {
                     let text = e.target.result;
                     if(ext === 'csv') {
-                        string2table(JSON.stringify(csv2json(text.substr(0,text.length))),table);
+                        string2table(JSON.stringify(csv2json(text.substr(0,text.length))),tbody);
                     }
                     else {
-                        string2table(text, table);
+                        string2table(text, tbody);
                     }
                 };
                 reader.readAsText(input.files[0]);
@@ -97,12 +97,12 @@ tableJsonify.prototype.alertFunction = function() {
             error_msg.innerHTML = e.message;
             error_msg.style.display = 'block';
         }
-        $(input).replaceWith($(input).val('').clone(true));
+        input.value = '';
     });
 
     file_export.addEventListener('click',function (e) {
         e.preventDefault();
-        let table_data = rows2json(table);
+        let table_data = rows2json(tbody);
         if(format === 'csv') {
             write2file(json2csv(table_data),format);
         }else {
@@ -113,7 +113,7 @@ tableJsonify.prototype.alertFunction = function() {
     //Sorting onclick actions implemented
     key_up.addEventListener('click',function (e) {
         e.preventDefault();
-        let sort_array = rows2json(table);
+        let sort_array = rows2json(tbody);
         sort_array.sort(function (a, b) {
             let name_a = a.name.toLowerCase();
             let name_b = b.name.toLowerCase();
@@ -129,7 +129,7 @@ tableJsonify.prototype.alertFunction = function() {
 
     key_down.addEventListener('click',function (e) {
         e.preventDefault();
-        let sort_array = rows2json(table);
+        let sort_array = rows2json(tbody);
         sort_array.sort(function (a, b) {
             let name_a = a.name.toLowerCase();
             let name_b = b.name.toLowerCase();
@@ -145,7 +145,7 @@ tableJsonify.prototype.alertFunction = function() {
 
     value_up.addEventListener('click',function (e) {
         e.preventDefault();
-        let sort_array = rows2json(table);
+        let sort_array = rows2json(tbody);
         sort_array.sort(function (a, b) {
             let value_a = a.value.toLowerCase();
             let value_b = b.value.toLowerCase();
@@ -161,7 +161,7 @@ tableJsonify.prototype.alertFunction = function() {
 
     value_down.addEventListener('click',function (e) {
         e.preventDefault();
-        let sort_array = rows2json(table);
+        let sort_array = rows2json(tbody);
         sort_array.sort(function (a, b) {
             let value_a = a.value.toLowerCase();
             let value_b = b.value.toLowerCase();
@@ -175,46 +175,56 @@ tableJsonify.prototype.alertFunction = function() {
         });
     });
 
-    for(el in change_format){
-        el.onclick = function () {
-            alert(1);
-        }
-    }
-    change_format.addEventListener('change',function () {
-        format = $(this).data('type');
-        let text_json = '[{"name":"<code>your name</code>","value":"<code>your value</code>"},{"name":"<code>your second name</code>","value":"<code>your second value</code>"}]';
-        let text_csv = '<code>Yourname</code>,<code>Yourvalue</code><br><code>Yourname</code>,<code>Yourvalue</code>';
-        if(format === 'csv') {
-            $(file_field).html(text_csv);
-        }else {
-            $(file_field).html(text_json);
-        }
+    json_file.addEventListener('click',function () {
+        format = this.value;
+        file_field.innerHTML = '[{"name":"<code>your name</code>","value":"<code>your value</code>"},{"name":"<code>your second name</code>","value":"<code>your second value</code>"}]';
     });
+
+    csv_file.addEventListener('click',function () {
+        format = this.value;
+        file_field.innerHTML = '<code>Yourname</code>,<code>Yourvalue</code><br><code>Yourname</code>,<code>Yourvalue</code>';
+    });
+
 };
 
-function string2table(string, table){
-    $.parseJSON(string).forEach(function(el){
-        $(table).find('tbody').append(obj2row(el));
+function string2table(string, tbody){
+    let object = JSON.parse(string);
+    object.forEach(function(el){
+        tbody.appendChild(obj2row(el));
     });
 }
 
-function rows2json(table){
-    let tbody = $(table).find('tbody');
+function rows2json(tbody){
     var array = [];
-    tbody.find('tr').each(function(){
-        let name = $(this).find('td:nth-child(1)').text();
-        let value = $(this).find('td:nth-child(2)').text();
+    tbody.querySelectorAll('tr').forEach(function(el){
+        let name = el.querySelector('td:nth-child(1)').innerText;
+        let value = el.querySelector('td:nth-child(2)').innerText;
         array.push({name:name, value:value});
     });
     return array;
 }
 
 function obj2row(obj){
-    let tr = $('<tr></tr>');
-    let td = $('<td></td>');
-    let actions = '<button class="btn" onclick="edit_tr()"><span class="fa fa-pencil"></span></button>' +
-        '<button class="btn" onclick="delete_tr()"><span class="fa fa-trash-o"></span></button>';
-    tr.append(td.clone().text(obj.name)).append(td.clone().text(obj.value)).append(td.clone().html(actions));
+    let tr = document.createElement('tr');
+    let td_1 = tr.appendChild(document.createElement('td'));
+    let td_2 = tr.appendChild(document.createElement('td'));
+    let td_3 = tr.appendChild(document.createElement('td'));
+    let btn = document.createElement('button');
+    btn.className = 'btn';
+    let btn_delete = btn.cloneNode(true);
+    btn_delete.addEventListener("click", delete_tr, true);
+    let btn_edit = btn.cloneNode(true);
+    btn_edit.addEventListener("click", edit_tr, true);
+    let span_edit = document.createElement('span');
+    span_edit.className = 'fa fa-pencil';
+    let span_delete = document.createElement('span');
+    span_delete.className = 'fa fa-trash-o';
+    btn_delete.appendChild(span_delete);
+    btn_edit.appendChild(span_edit);
+    td_1.innerText = obj.name;
+    td_2.innerText = obj.value;
+    td_3.appendChild(btn_edit);
+    td_3.appendChild(btn_delete);
     return tr;
 }
 
@@ -250,37 +260,48 @@ function json2csv(obj) {
 }
 
 function delete_tr(e){
-    console.log(1);
+    let current = e.currentTarget;
+    let parent_tr = current.parentNode.parentNode;
+    parent_tr.parentNode.removeChild(parent_tr);
 }
 
 function save_tr(e){
-    console.log(2);
-    this.onclick = 'edit_tr()';
-    $(this).find('span').removeClass('fa-save');
-    $(this).find('span').addClass('fa-pencil');
+    let current = e.currentTarget;
+    let parent_tr = current.parentNode.parentNode;
+    let key_td = parent_tr.querySelector('td:nth-child(1)');
+    let value_td = parent_tr.querySelector('td:nth-child(2)');
+    current.querySelector('span').className = 'fa fa-pencil';
 
-    $(this).removeClass('save-action');
-    $(this).addClass('edit-action');
+    current.removeEventListener('click', save_tr, true);
+    current.addEventListener('click', edit_tr, true);
 
-    let key = $(this).parents('tr').find('td:nth-child(1)');
-    let value = $(this).parents('tr').find('td:nth-child(2)');
+    let input_key = key_td.querySelector('input');
+    let input_value = value_td.querySelector('input');
 
-    $(key).text($(key).find('input').val());
-    $(value).text($(value).find('input').val());
+    key_td.innerText = input_key.value;
+    value_td.innerText = input_value.value;
 }
 
 function edit_tr(e){
-    console.log(3);
-    this.onclick = 'save_tr()';
+    let current = e.currentTarget;
+    let parent_tr = current.parentNode.parentNode;
+    let key_td = parent_tr.querySelector('td:nth-child(1)');
+    let value_td = parent_tr.querySelector('td:nth-child(2)');
 
-    this.closest('fa-save')
-    $(this).find('span').removeClass('fa-save');
-    $(this).find('span').addClass('fa-pencil');
+    current.querySelector('span').className = 'fa fa-save';
 
-    let key = $(this).parents('tr').find('td:nth-child(1)');
-    let value = $(this).parents('tr').find('td:nth-child(2)');
+    current.removeEventListener('click', edit_tr, true);
+    current.addEventListener('click', save_tr, true);
 
-    $(key).text($(key).find('input').val());
-    $(value).text($(value).find('input').val());
+    let input_field = document.createElement('input');
+    input_field.type = 'text';
 
+    let input_key = input_field.cloneNode(true);
+    input_key.value = key_td.innerText;
+
+    let input_value = input_field.cloneNode(true);
+    input_value.value = value_td.innerText;
+
+    key_td.replaceChild(input_key,key_td.firstChild);
+    value_td.replaceChild(input_value,value_td.firstChild);
 }

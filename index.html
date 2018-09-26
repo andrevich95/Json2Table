@@ -5,9 +5,6 @@
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="css/style.css"/>
-    <script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="node_modules/write/index.js"></script>
     <script type="text/javascript" src="js/json_table.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
 </head>
@@ -35,8 +32,8 @@
                     <button class="btn btn-primary" id="replace-json">REPLACE TABLE DATA</button>
                     <button class="btn btn-primary" id="load-json">LOAD TO TEXT AREA</button>
                     <button class="btn btn-success" id="file-export">EXPORT FILE</button>
-                    <label class="radio-inline"><input type="radio" name="file-format" value="json" checked="checked">JSON</label>
-                    <label class="radio-inline"><input type="radio" name="file-format" value="csv">CSV</label>
+                    <label class="radio-inline"><input type="radio" name="file-format" id="json-file" value="json" checked="checked">JSON</label>
+                    <label class="radio-inline"><input type="radio" name="file-format" id="csv-file" value="csv">CSV</label>
                     <div class="input-group col-md-6">
                         <div class="custom-file">
                             <input class="custom-file-input" type="file" id="file-load" accept="application/json, .csv">
